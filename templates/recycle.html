@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Recycle Bin — Finance Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Recycle Bin</h1>
+    <p class="page-subtitle">
+      Deleted expenses are kept for {{ retention_days }} days. Restore or permanently remove them.
+    </p>
+  </div>
+</div>
+
+{% if expenses %}
+<div class="table-wrapper section-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Deleted</th>
+        <th>Date</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th style="text-align:right">Amount</th>
+        <th style="text-align:right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for expense in expenses %}
+      <tr id="recycle-row-{{ expense.id }}">
+        <td class="text-muted">{{ expense.updated_at.strftime('%d %b %Y') }}</td>
+        <td>{{ expense.date_display }}</td>
+        <td class="td-title">{{ expense.title }}</td>
+        <td><span class="badge badge-{{ expense.category }}">{{ expense.category }}</span></td>
+        <td class="td-amount">{{ expense.amount_display }}</td>
+        <td class="td-actions">
+          <button class="btn btn-primary btn-sm"
+                  hx-post="/api/expenses/{{ expense.id }}/restore"
+                  hx-target="#recycle-row-{{ expense.id }}"
+                  hx-swap="delete">
+            Restore
+          </button>
+          <button class="btn btn-danger btn-sm"
+                  hx-delete="/api/expenses/{{ expense.id }}/permanent"
+                  hx-target="#recycle-row-{{ expense.id }}"
+                  hx-swap="delete"
+                  hx-confirm="Permanently delete '{{ expense.title }}'?">
+            Delete Forever
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="section-card">
+  {% set title = "Recycle bin is empty" %}
+  {% set message = "Deleted expenses will appear here for " ~ retention_days ~ " days before automatic removal." %}
+  {% include "partials/empty_state.html" %}
+</div>
+{% endif %}
+{% endblock %}

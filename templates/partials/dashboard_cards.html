@@ -1,0 +1,32 @@
+<div class="cards-grid">
+  <div class="metric-card">
+    <div class="metric-label">Total Spending</div>
+    <div class="metric-value">{{ format_inr(stats.total_all_time) }}</div>
+    <div class="metric-sub">All time</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">This Month</div>
+    <div class="metric-value">{{ format_inr(stats.total_this_month) }}</div>
+    <div class="metric-sub">{{ stats.month_name }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Transactions</div>
+    <div class="metric-value">{{ stats.count }}</div>
+    <div class="metric-sub">Total records</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Average Expense</div>
+    <div class="metric-value">{{ format_inr(stats.average) }}</div>
+    <div class="metric-sub">Per transaction</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Highest Expense</div>
+    <div class="metric-value">{{ format_inr(stats.highest) }}</div>
+    <div class="metric-sub">Single transaction peak</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Top Category</div>
+    <div class="metric-value">{{ stats.top_category }}</div>
+    <div class="metric-sub">{{ stats.month_name }} by spend</div>
+  </div>
+</div>

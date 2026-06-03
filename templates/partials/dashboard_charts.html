@@ -1,0 +1,48 @@
+<div class="comparison-banner comparison-{{ analytics.change_direction }}">
+  <div class="comparison-main">
+    <span class="comparison-label">Month-over-month</span>
+    <span class="comparison-value">
+      {% if analytics.change_direction == 'up' %}↑{% elif analytics.change_direction == 'down' %}↓{% else %}→{% endif %}
+      {{ analytics.change_pct|abs }}%
+    </span>
+  </div>
+  <div class="comparison-detail">
+    {{ analytics.month_label }}:
+    <strong>₹{{ "{:,.0f}".format(analytics.current_month_total) }}</strong>
+    vs last month:
+    <strong>₹{{ "{:,.0f}".format(analytics.previous_month_total) }}</strong>
+  </div>
+</div>
+
+<div class="charts-grid charts-grid-4">
+  <div class="chart-card">
+    <div class="chart-title">Spending by Category</div>
+    <div class="chart-container">
+      <canvas id="pie-chart"
+              data-breakdown='{{ analytics.breakdown | tojson }}'></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Daily Spending — {{ analytics.month_label }}</div>
+    <div class="chart-container">
+      <canvas id="line-chart"
+              data-daily='{{ analytics.daily_totals | tojson }}'></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Monthly Comparison (6 months)</div>
+    <div class="chart-container">
+      <canvas id="bar-chart"
+              data-labels='{{ analytics.monthly_labels | tojson }}'
+              data-values='{{ analytics.monthly_values | tojson }}'></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Spending Trend</div>
+    <div class="chart-container">
+      <canvas id="trend-chart"
+              data-labels='{{ analytics.monthly_labels | tojson }}'
+              data-values='{{ analytics.monthly_values | tojson }}'></canvas>
+    </div>
+  </div>
+</div>

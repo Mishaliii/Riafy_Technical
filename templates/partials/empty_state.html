@@ -1,0 +1,14 @@
+<div class="empty-state">
+  <div class="empty-icon">₹</div>
+  <div class="empty-title">{{ title | default("No expenses found") }}</div>
+  <p class="empty-message">{{ message | default("You haven't recorded any expenses yet.") }}</p>
+  {% if show_cta | default(false) %}
+  <button class="btn btn-primary"
+          hx-get="/htmx/expenses/form"
+          hx-target="#modal-content"
+          hx-swap="innerHTML"
+          onclick="openModal()">
+    Add your first expense
+  </button>
+  {% endif %}
+</div>

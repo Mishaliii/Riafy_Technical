@@ -1,0 +1,70 @@
+<div class="section-card" id="summary-panel"
+     hx-get="/htmx/summary"
+     hx-trigger="refresh"
+     hx-vals='{"month": "{{ summary_month }}"}'
+     hx-swap="outerHTML">
+
+  <div class="section-header">
+    <span class="section-title">Monthly Summary</span>
+    <input type="month" id="month-picker"
+           value="{{ summary_month }}"
+           hx-get="/htmx/summary"
+           hx-target="#summary-panel"
+           hx-swap="outerHTML"
+           hx-trigger="change"
+           name="month">
+  </div>
+
+  <h3 style="margin-bottom:1rem">{{ month_label }}</h3>
+
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-label">Total</div>
+      <div class="summary-value">{{ format_inr(summary.total) }}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Count</div>
+      <div class="summary-value">{{ summary.count }}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Average</div>
+      <div class="summary-value">{{ format_inr(summary.average) }}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Highest</div>
+      <div class="summary-value">{{ format_inr(summary.highest) }}</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-title" style="margin-bottom:1rem">Category Breakdown</div>
+    {% set max_amount = summary.breakdown.values()|max %}
+    {% for cat, amount in summary.breakdown|dictsort(by='value', reverse=true) %}
+      {% if amount > 0 %}
+      <div class="leaderboard-item">
+        <span class="leaderboard-rank">{{ loop.index }}</span>
+        <span class="leaderboard-cat">
+          <span class="badge badge-{{ cat }}">{{ cat }}</span>
+        </span>
+        <div class="leaderboard-bar-bg">
+          <div class="leaderboard-bar-fill"
+               style="width: {% if max_amount > 0 %}{{ ((amount / max_amount) * 100)|round }}{% else %}0{% endif %}%">
+          </div>
+        </div>
+        <span class="leaderboard-amount">₹{{ "{:,.0f}".format(amount) }}</span>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="section-title" style="margin-bottom:0.75rem">
+      💡 Insights for {{ month_label }}
+    </div>
+    {% for insight in insights %}
+    <div class="insight-item">
+      <span class="insight-dot"></span>{{ insight }}
+    </div>
+    {% endfor %}
+  </div>
+</div>

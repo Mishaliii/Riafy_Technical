@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Finance Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">₹</div>
+      <div>
+        <div class="brand-name">Finance Dashboard</div>
+        <div class="brand-sub">Personal Analytics</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+        📊 Dashboard
+      </a>
+      <a href="/expenses" class="nav-link {% if active_page == 'expenses' %}active{% endif %}">
+        📋 Expenses
+      </a>
+      <a href="/recycle" class="nav-link {% if active_page == 'recycle' %}active{% endif %}">
+        ♻️ Recycle Bin
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-card" id="modal-content"></div>
+</div>
+
+<script src="/static/js/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

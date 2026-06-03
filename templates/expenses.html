@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Expenses — Finance Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Expenses</h1>
+    <p class="page-subtitle">Manage and filter all your transactions.</p>
+  </div>
+  <div class="flex gap-2">
+    <button class="btn btn-primary"
+            hx-get="/htmx/expenses/form"
+            hx-target="#modal-content"
+            hx-swap="innerHTML"
+            onclick="openModal()">
+      Add Expense
+    </button>
+    <a class="btn btn-ghost" id="export-link" href="/api/expenses/export">Export CSV</a>
+  </div>
+</div>
+
+<div class="filter-panel">
+  <form id="expense-filter-form"
+        hx-get="/htmx/expenses/list"
+        hx-target="#expense-list-container"
+        hx-trigger="submit"
+        hx-swap="innerHTML"
+        hx-indicator="#filter-spinner">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category">
+          <option value="">All categories</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}">{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date From</label>
+        <input type="date" name="date_from">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date To</label>
+        <input type="date" name="date_to">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Search</label>
+        <input type="text" name="title_search" placeholder="Title or note...">
+      </div>
+    </div>
+    <div class="filter-grid-2">
+      <div class="form-group">
+        <label class="form-label">Amount Min (₹)</label>
+        <input type="number" name="amount_min" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount Max (₹)</label>
+        <input type="number" name="amount_max" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Month</label>
+        <input type="month" name="month">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input type="number" name="year" min="2000" max="2100" placeholder="e.g. 2026">
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary">Apply</button>
+      <button type="reset" class="btn btn-ghost" onclick="clearExpenseFilters(event)">Clear</button>
+      <span id="filter-spinner" class="htmx-indicator spinner"></span>
+    </div>
+  </form>
+</div>
+
+<div id="expense-list-container">
+  {% include "partials/expense_list.html" %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function clearExpenseFilters(event) {
+    event.preventDefault();
+    const form = document.getElementById("expense-filter-form");
+    form.reset();
+    htmx.trigger(form, "submit");
+    syncExportLink();
+  }
+
+  function syncExportLink() {
+    const form = document.getElementById("expense-filter-form");
+    const exportLink = document.getElementById("export-link");
+    if (!form || !exportLink) return;
+    const params = new URLSearchParams(new FormData(form));
+    for (const [key, value] of [...params.entries()]) {
+      if (!value) params.delete(key);
+    }
+    exportLink.href = `/api/expenses/export?${params.toString()}`;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("expense-filter-form");
+    if (form) {
+      form.addEventListener("submit", syncExportLink);
+      syncExportLink();
+    }
+  });
+</script>
+{% endblock %}

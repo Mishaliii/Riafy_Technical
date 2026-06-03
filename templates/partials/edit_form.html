@@ -1,0 +1,45 @@
+<tr id="row-{{ expense.id }}">
+  <form hx-put="/api/expenses/{{ expense.id }}"
+        hx-target="#row-{{ expense.id }}"
+        hx-swap="outerHTML"
+        style="display:contents">
+    <td>
+      <input type="date" name="date"
+             value="{{ expense.date.isoformat() }}"
+             style="min-width:130px">
+    </td>
+    <td>
+      <input type="text" name="title"
+             value="{{ expense.title }}"
+             maxlength="100" style="min-width:160px">
+    </td>
+    <td>
+      <select name="category" style="min-width:130px">
+        {% for cat in categories %}
+        <option value="{{ cat }}" {% if expense.category == cat %}selected{% endif %}>
+          {{ cat }}
+        </option>
+      {% endfor %}
+      </select>
+    </td>
+    <td>
+      <input type="number" name="amount"
+             value="{{ expense.amount }}"
+             min="0.01" step="0.01" style="min-width:100px">
+    </td>
+    <td>
+      <input type="text" name="note"
+             value="{{ expense.note or '' }}"
+             maxlength="500" style="min-width:150px">
+    </td>
+    <td class="td-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Save</button>
+      <button type="button" class="btn btn-ghost btn-sm"
+              hx-get="/htmx/expenses/{{ expense.id }}/view"
+              hx-target="#row-{{ expense.id }}"
+              hx-swap="outerHTML">
+        Cancel
+      </button>
+    </td>
+  </form>
+</tr>

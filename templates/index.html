@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Finance Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Track expenses, understand spending habits, gain financial insights.</p>
+  </div>
+</div>
+
+<div class="filter-panel">
+  <form id="dashboard-filter-form"
+        hx-get="/htmx/dashboard/charts"
+        hx-target="#dashboard-charts-panel"
+        hx-swap="innerHTML"
+        hx-trigger="submit"
+        hx-indicator="#dashboard-filter-spinner">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select name="category">
+          <option value="">All categories</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}">{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Month</label>
+        <input type="month" name="month" value="{{ current_month }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date From</label>
+        <input type="date" name="date_from">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date To</label>
+        <input type="date" name="date_to">
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+      <button type="reset" class="btn btn-ghost"
+              onclick="resetDashboardFilters()">Clear</button>
+      <span id="dashboard-filter-spinner" class="htmx-indicator spinner"></span>
+    </div>
+  </form>
+</div>
+
+<div id="dashboard-cards"
+     hx-get="/htmx/dashboard/cards"
+     hx-include="#dashboard-filter-form"
+     hx-trigger="load, refresh"
+     hx-swap="innerHTML">
+  {% include "partials/dashboard_cards.html" %}
+</div>
+
+<div id="dashboard-charts-panel">
+  {% include "partials/dashboard_charts.html" %}
+</div>
+
+<div class="insights-panel">
+  <div class="insights-title">💡 Spending Insights</div>
+  {% for insight in insights %}
+  <div class="insight-item">
+    <span class="insight-dot"></span>
+    {{ insight }}
+  </div>
+  {% else %}
+  <div class="text-muted">No insights yet. Add more expenses.</div>
+  {% endfor %}
+</div>
+
+<div id="summary-panel-mount"
+     hx-get="/htmx/summary"
+     hx-trigger="load, refresh"
+     hx-vals='{"month": "{{ current_month }}"}'
+     hx-swap="outerHTML">
+</div>
+
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-title">Recent Transactions</span>
+    <a href="/expenses" class="view-all-link">View all →</a>
+  </div>
+  {% if recent_expenses %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th style="text-align:right">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in recent_expenses %}
+        <tr>
+          <td>{{ expense.date_display }}</td>
+          <td class="td-title" title="{{ expense.title }}">{{ expense.title }}</td>
+          <td><span class="badge badge-{{ expense.category }}">{{ expense.category }}</span></td>
+          <td class="td-amount">{{ expense.amount_display }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted">No recent transactions yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("dashboard-filter-form");
+    if (!form) return;
+    form.addEventListener("htmx:afterRequest", () => {
+      htmx.trigger("#dashboard-cards", "refresh");
+    });
+  });
+
+  function resetDashboardFilters() {
+    const form = document.getElementById("dashboard-filter-form");
+    if (!form) return;
+    form.reset();
+    form.querySelector('[name="month"]').value = "{{ current_month }}";
+    setTimeout(() => htmx.trigger(form, "submit"), 0);
+  }
+</script>
+{% endblock %}

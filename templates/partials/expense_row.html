@@ -1,0 +1,30 @@
+<tr id="row-{{ expense.id }}">
+  <td>{{ expense.date_display }}</td>
+  <td class="td-title" title="{{ expense.title }}">{{ expense.title }}</td>
+  <td>
+    <span class="badge badge-{{ expense.category }}">{{ expense.category }}</span>
+  </td>
+  <td class="td-amount">{{ expense.amount_display }}</td>
+  <td class="td-note" title="{{ expense.note or '' }}">
+    {% if expense.note and expense.note|length > 30 %}
+      {{ expense.note[:30] }}...
+    {% else %}
+      {{ expense.note or '—' }}
+    {% endif %}
+  </td>
+  <td class="td-actions">
+    <button class="btn btn-ghost btn-sm"
+            hx-get="/htmx/expenses/{{ expense.id }}/edit"
+            hx-target="#row-{{ expense.id }}"
+            hx-swap="outerHTML">
+      Edit
+    </button>
+    <button class="btn btn-danger btn-sm"
+            hx-delete="/api/expenses/{{ expense.id }}"
+            hx-target="#row-{{ expense.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Delete '{{ expense.title }}'? This cannot be undone.">
+      Delete
+    </button>
+  </td>
+</tr>
